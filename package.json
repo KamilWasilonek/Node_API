@@ -1,0 +1,19 @@
+{
+  "name": "node_api",
+  "version": "1.0.0",
+  "description": "A Node.js RESTful API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wasilonek/Node_API.git"
+  },
+  "author": "Kamil Wasilonek",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wasilonek/Node_API/issues"
+  },
+  "homepage": "https://github.com/Wasilonek/Node_API#readme"
+}
