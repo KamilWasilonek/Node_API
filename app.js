@@ -1,3 +1,4 @@
+const { MONGO_DB_PASSWORD } = require('./config');
 const express = require('express');
 // Morgan logs incoming requests
 const morgan = require('morgan');
@@ -11,11 +12,10 @@ const mealsRoutes = require('./api/routes/meals');
 
 mongoose.connect(
   'mongodb+srv://admin:' +
-    process.env.MONGO_DB_PASSWORD +
+    MONGO_DB_PASSWORD +
     '@meals-44tke.mongodb.net/test?retryWrites=true&w=majority',
-  { useNewUrlParser: true }
+  { useNewUrlParser: true, useUnifiedTopology: true }
 );
-console.log(process.env.MONGO_DB_PASSWOR);
 
 // Set request logs
 app.use(morgan('dev'));
