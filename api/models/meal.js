@@ -5,4 +5,4 @@ const mealSchema = mongoose.Schema({
   name: String
 });
 
-module.exports = mongoose.model('Meal', mealSchema);
+module.exports = mongoose.model('Meal', mealSchema, "Meals");

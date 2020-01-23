@@ -13,7 +13,7 @@ const mealsRoutes = require('./api/routes/meals');
 mongoose.connect(
   'mongodb+srv://admin:' +
     MONGO_DB_PASSWORD +
-    '@meals-44tke.mongodb.net/test?retryWrites=true&w=majority',
+    '@meals-44tke.mongodb.net/API?retryWrites=true&w=majority',
   { useNewUrlParser: true, useUnifiedTopology: true }
 );
 
