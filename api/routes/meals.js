@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+
+const Meal = require('../models/meal');
 
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
@@ -10,23 +13,46 @@ router.get('/', (req, res, next) => {
 
 // Handle POST request to "/meals"
 router.post('/', (req, res, next) => {
-  const meal = {
-    // bodyParser allows to use body property
-    name: req.body.name, 
-  }
-  // Status 201 - resource created
-  res.status(201).json({
-    message: 'Handle POST to /meals'
+  const meal = new Meal({
+    _id: new mongoose.Types.ObjectId(),
+    name: req.body.name
   });
+
+  // Save meal in database
+  meal
+    .save()
+    .then(response => {
+      // Status 201 - resource created
+      res.status(201).json({
+        message: response,
+        meal: meal,
+      });
+    })
+    .catch(err => {
+      res.error(500).json({
+        error: err
+      })
+    });
 });
 
 // Handle GET request to specific meal
-router.get('/:productId', (req, res, next) => {
-  const productId = req.params.productId;
-  res.status(200).json({
-    message: `Return product with id ${productId}`,
-    id: id
-  });
+router.get('/:mealId', (req, res, next) => {
+  const mealId = req.params.mealId;
+  Meal.findById(mealId).exec().then(meal => {
+    if(meal) {
+      res.status(200).json({
+        meal: meal,
+      })
+    } else {
+      res.status(500).json({
+        message: "Not found meal with provided ID"
+      })
+    }
+  }).catch(err => {
+    res.status(500).json({
+      error: err
+    })
+  })
 });
 
 // Handle PATCH request to specific meal
