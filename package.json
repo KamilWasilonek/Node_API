@@ -4,14 +4,10 @@
   "description": "Node API",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js"
   },
   "author": "Kamil Wasilonek",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Wasilonek/Node_API/issues"
-  },
-  "homepage": "https://github.com/Wasilonek/Node_API#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
