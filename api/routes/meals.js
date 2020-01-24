@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
+var fs = require('fs');
+
 
 const storage = multer.diskStorage({
-  destination: function(req, res, callback) {
+  destination: function(req, file, callback) {
     callback(null, './uploads/');
   },
-  filename: function(req, res, callback) {
+  filename: function(req, file, callback) {
     callback(null, file.originalname);
   }
 });
@@ -32,25 +34,22 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
+
 const Meal = require('../models/meal');
 
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
   Meal.find()
-    .select('image name _id')
+    .select('image name _id desc')
     .exec()
     .then(meals => {
-      response = {
-        amount: meals.length,
-        meals: meals
-      };
       if (meals.length === 0) {
         res.status(200).json({
           message: 'Not found meals'
         });
       } else {
         res.status(200).json({
-          meals: response
+          message: meals
         });
       }
     })
@@ -62,11 +61,12 @@ router.get('/', (req, res, next) => {
 });
 
 // Handle POST request to "/meals"
-router.post('/', upload.single('mealImage'), (req, res, next) => {
+router.post('/', upload.single('image'), (req, res, next) => {
   const meal = new Meal({
     _id: new mongoose.Types.ObjectId(),
-    mealImage: req.file.path,
-    name: req.body.name
+    image: req.file.path,
+    name: req.body.name,
+    desc: req.body.desc,
   });
 
   // Save meal in database
