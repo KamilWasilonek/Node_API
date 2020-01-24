@@ -20,6 +20,8 @@ mongoose.connect(
 // Set request logs
 app.use(morgan('dev'));
 
+app.use("/uploads", express.static('uploads'));
+
 // Set accepted body formats
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

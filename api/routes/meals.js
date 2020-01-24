@@ -1,21 +1,56 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function(req, res, callback) {
+    callback(null, './uploads/');
+  },
+  filename: function(req, res, callback) {
+    callback(null, file.originalname);
+  }
+});
+
+const fileFilter = (req, file, callback) => {
+  if (
+    file.mimetype === 'image/jpeg' ||
+    file.mimetype === 'image/jpg' ||
+    file.mimetype === 'image/png'
+  ) {
+    callback(null, true);
+  } else {
+    callback(new Error("Wrong image format"), false);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
+});
 
 const Meal = require('../models/meal');
 
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
   Meal.find()
+    .select('image name _id')
     .exec()
     .then(meals => {
+      response = {
+        amount: meals.length,
+        meals: meals
+      };
       if (meals.length === 0) {
         res.status(200).json({
           message: 'Not found meals'
         });
       } else {
         res.status(200).json({
-          meals: meals
+          meals: response
         });
       }
     })
@@ -27,9 +62,10 @@ router.get('/', (req, res, next) => {
 });
 
 // Handle POST request to "/meals"
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('mealImage'), (req, res, next) => {
   const meal = new Meal({
     _id: new mongoose.Types.ObjectId(),
+    mealImage: req.file.path,
     name: req.body.name
   });
 
@@ -79,7 +115,7 @@ router.patch('/:mealId', (req, res, next) => {
   for (const prop of req.body) {
     updatedMeal[prop.propName] = prop.value;
   }
-  console.log(updatedMeal)
+  console.log(updatedMeal);
   Meal.updateOne({ _id: mealId }, { $set: updatedMeal })
     .exec()
     .then(response => {
