@@ -4,7 +4,7 @@
   "description": "Node API",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server.js"
   },
   "author": "Kamil Wasilonek",
   "license": "ISC",
