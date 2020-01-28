@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
-var fs = require('fs');
-
 
 const storage = multer.diskStorage({
   destination: function(req, file, callback) {
@@ -40,12 +38,12 @@ const Meal = require('../models/meal');
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
   Meal.find()
-    .select('image name _id desc')
+    .select('_id image name desc')
     .exec()
     .then(meals => {
       if (meals.length === 0) {
         res.status(200).json({
-          message: 'Not found meals'
+          message: []
         });
       } else {
         res.status(200).json({
