@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const multer = require('multer');
+const checkAuth = require('../middleware/check-auth');
+
+const Meal = require('../models/meal');
+
+const helpers = require('../helpers/server-results');
 
 const storage = multer.diskStorage({
   destination: function(req, file, callback) {
@@ -20,7 +25,7 @@ const fileFilter = (req, file, callback) => {
   ) {
     callback(null, true);
   } else {
-    callback(new Error("Wrong image format"), false);
+    callback(new Error('Wrong image format'), false);
   }
 };
 
@@ -32,54 +37,38 @@ const upload = multer({
   fileFilter: fileFilter
 });
 
-
-const Meal = require('../models/meal');
-
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
   Meal.find()
-    .select('_id image name desc')
     .exec()
     .then(meals => {
-      if (meals.length === 0) {
-        res.status(200).json({
-          message: []
-        });
-      } else {
-        res.status(200).json({
-          message: meals
-        });
-      }
+      res.status(200).json({
+        meals: meals
+      });
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      helpers.internalServerError(err);
     });
 });
 
 // Handle POST request to "/meals"
-router.post('/', upload.single('image'), (req, res, next) => {
+router.post('/', checkAuth, upload.single('image'), (req, res, next) => {
   const meal = new Meal({
     _id: new mongoose.Types.ObjectId(),
     image: req.file.path,
     name: req.body.name,
-    desc: req.body.desc,
+    desc: req.body.desc
   });
 
-  // Save meal in database
   meal
     .save()
-    .then(response => {
-      // Status 201 - resource created
+    .then(meal => {
       res.status(201).json({
-        meal: response
+        meal: meal
       });
     })
     .catch(err => {
-      res.error(500).json({
-        error: err
-      });
+      helpers.internalServerError(err);
     });
 });
 
@@ -100,47 +89,38 @@ router.get('/:mealId', (req, res, next) => {
       }
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      helpers.internalServerError(err);
     });
 });
 
 // Handle PATCH request to specific meal
-router.patch('/:mealId', (req, res, next) => {
+router.patch('/:mealId', checkAuth, (req, res, next) => {
   const mealId = req.params.mealId;
   const updatedMeal = {};
+
   for (const prop of req.body) {
     updatedMeal[prop.propName] = prop.value;
   }
-  console.log(updatedMeal);
+
   Meal.updateOne({ _id: mealId }, { $set: updatedMeal })
     .exec()
     .then(response => {
-      res.status(200).json({
-        message: response
-      });
+      helpers.correctRequest(res, response);
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      helpers.internalServerError(err);
     });
 });
 
 // Handle DELETE request to specific meal
-router.delete('/:mealId', (req, res, next) => {
+router.delete('/:mealId', checkAuth, (req, res, next) => {
   Meal.remove({ _id: req.params.mealId })
     .exec()
     .then(response => {
-      res.status(200).json({
-        message: response
-      });
+      helpers.correctRequest(res, response);
     })
     .catch(err => {
-      res.status(500).json({
-        error: err
-      });
+      helpers.internalServerError(err);
     });
 });
 
