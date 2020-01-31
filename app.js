@@ -11,6 +11,7 @@ var cors = require('cors')
 const app = express();
 
 const mealsRoutes = require('./api/routes/meals');
+const userRoutes = require('./api/routes/user');
 
 mongoose.connect(
   'mongodb+srv://admin:' +
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 
 // Set handlers for specific routes
 app.use('/meals', mealsRoutes);
+app.use('/user', userRoutes);
 
 // Handle "Router not found" error
 app.use((req, res, next) => {
