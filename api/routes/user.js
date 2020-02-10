@@ -11,6 +11,8 @@ const helpers = require('../helpers/server-results');
 // Handle POST request to "/user/signup"
 router.post('/signup', (req, res, next) => {
   const email = req.body.email.toLowerCase().trim();
+  const name = req.body.name.trim();
+  const surname = req.body.surname.trim();
   User.find({ email: email })
     .exec()
     .then(user => {
@@ -29,8 +31,10 @@ router.post('/signup', (req, res, next) => {
           } else {
             const user = new User({
               _id: mongoose.Types.ObjectId(),
-              email: req.body.email.toLowerCase(),
-              password: hash
+              email: email,
+              password: hash,
+              name: name,
+              surname: surname
             });
             user
               .save()
@@ -61,32 +65,32 @@ router.post('/login', (req, res, next) => {
       if (user.length < 1) {
         return helpers.authFailed(res);
       }
-      bcrypt.compare(
-        password,
-        user[0].password,
-        (err, result) => {
-          if (err) {
-            helpers.authFailed(res);
-          }
-          if (result) {
-            const token = jwt.sign(
-              {
-                id: user[0].id,
-                email: user[0].email
-              },
-              process.env.JWT_KEY,
-              {
-                expiresIn: '7d'
-              }
-            );
-            return res.status(200).json({
-              message: 'Auth successful',
-              token: token
-            });
-          }
+      bcrypt.compare(password, user[0].password, (err, result) => {
+        if (err) {
           helpers.authFailed(res);
         }
-      );
+        if (result) {
+          const token = jwt.sign(
+            {
+              id: user[0].id,
+              email: user[0].email
+            },
+            process.env.JWT_KEY,
+            {
+              expiresIn: '7d'
+            }
+          );
+          return res.status(200).json({
+            message: 'Auth successful',
+            token: token,
+            _id: user[0].id,
+            email: user[0].email,
+            name: user[0].name,
+            surname: user[0].surname
+          });
+        }
+        helpers.authFailed(res);
+      });
     })
     .catch(err => {
       helpers.internalServerError(res, err);

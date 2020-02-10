@@ -18,7 +18,7 @@ Add new meal:
 
 Update meal with specific ID:
 
-- PATCH https://meals-node-api.herokuapp.com/meals
+- PUT https://meals-node-api.herokuapp.com/meals
 
 Delete meal with specific ID:
 

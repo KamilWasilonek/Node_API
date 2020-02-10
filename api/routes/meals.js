@@ -53,11 +53,18 @@ router.get('/', (req, res, next) => {
 
 // Handle POST request to "/meals"
 router.post('/', checkAuth, upload.single('image'), (req, res, next) => {
+  // console.log(req.body.authorId);
   const meal = new Meal({
     _id: new mongoose.Types.ObjectId(),
     image: req.file.path,
     name: req.body.name,
-    desc: req.body.desc
+    desc: req.body.desc,
+    timeOfPreparation: req.body.timeOfPreparation,
+    author: {
+      _id: req.body.authorId,
+      name: req.body.authorName,
+      surname: req.body.authorSurname
+    }
   });
 
   meal
@@ -68,7 +75,7 @@ router.post('/', checkAuth, upload.single('image'), (req, res, next) => {
       });
     })
     .catch(err => {
-      helpers.internalServerError(err);
+      helpers.internalServerError(res, err);
     });
 });
 
@@ -89,26 +96,21 @@ router.get('/:mealId', (req, res, next) => {
       }
     })
     .catch(err => {
-      helpers.internalServerError(err);
+      helpers.internalServerError(res, err);
     });
 });
 
-// Handle PATCH request to specific meal
-router.patch('/:mealId', checkAuth, (req, res, next) => {
+// Handle PUT request to specific meal
+router.put('/:mealId', checkAuth, (req, res, next) => {
   const mealId = req.params.mealId;
-  const updatedMeal = {};
 
-  for (const prop of req.body) {
-    updatedMeal[prop.propName] = prop.value;
-  }
-
-  Meal.updateOne({ _id: mealId }, { $set: updatedMeal })
+  Meal.updateOne({ _id: mealId }, { $set: req.body })
     .exec()
     .then(response => {
       helpers.correctRequest(res, response);
     })
     .catch(err => {
-      helpers.internalServerError(err);
+      helpers.internalServerError(res, err);
     });
 });
 
