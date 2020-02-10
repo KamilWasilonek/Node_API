@@ -5,10 +5,13 @@ const morgan = require('morgan');
 // Allows to parse request body
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+var cors = require('cors')
+
 
 const app = express();
 
 const mealsRoutes = require('./api/routes/meals');
+const userRoutes = require('./api/routes/user');
 
 mongoose.connect(
   'mongodb+srv://admin:' +
@@ -20,16 +23,19 @@ mongoose.connect(
 // Set request logs
 app.use(morgan('dev'));
 
-app.use("/uploads", express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 // Set accepted body formats
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+app.use(cors());
+app.options("*", cors());
+
 // Set CORS configuration
 app.use((req, res, next) => {
   // Allow anyone to make request
-  req.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Origin", "*");
 
   // Set which information can be included into the header
   res.header(
@@ -38,8 +44,8 @@ app.use((req, res, next) => {
   );
 
   // Browser will send OPTIONS before PUT or PATCH request to check possibility of making request
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE');
+  if (res.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE, OPTIONS');
     return res.status(200).json({});
   }
   next();
@@ -47,6 +53,7 @@ app.use((req, res, next) => {
 
 // Set handlers for specific routes
 app.use('/meals', mealsRoutes);
+app.use('/user', userRoutes);
 
 // Handle "Router not found" error
 app.use((req, res, next) => {
