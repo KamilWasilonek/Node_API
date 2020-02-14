@@ -29,18 +29,19 @@ router.post('/signup', (req, res, next) => {
           if (err) {
             helpers.internalServerError(res, err);
           } else {
-            const user = new User({
+            const newUser = new User({
               _id: mongoose.Types.ObjectId(),
               email: email,
               password: hash,
               name: name,
               surname: surname
             });
-            user
+            newUser
               .save()
               .then(() => {
                 res.status(201).json({
-                  user: user
+                  message: 'User has been registered',
+                  user: newUser
                 });
               })
               .catch(err => {
@@ -72,7 +73,7 @@ router.post('/login', (req, res, next) => {
         if (result) {
           const token = jwt.sign(
             {
-              id: user[0].id,
+              _id: user[0].id,
               email: user[0].email
             },
             process.env.JWT_KEY,

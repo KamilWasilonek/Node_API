@@ -1,41 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const multer = require('multer');
+// const multer = require('multer');
 const checkAuth = require('../middleware/check-auth');
 
 const Meal = require('../models/meal');
 
 const helpers = require('../helpers/server-results');
-
-const storage = multer.diskStorage({
-  destination: function(req, file, callback) {
-    callback(null, './uploads/');
-  },
-  filename: function(req, file, callback) {
-    callback(null, file.originalname);
-  }
-});
-
-const fileFilter = (req, file, callback) => {
-  if (
-    file.mimetype === 'image/jpeg' ||
-    file.mimetype === 'image/jpg' ||
-    file.mimetype === 'image/png'
-  ) {
-    callback(null, true);
-  } else {
-    callback(new Error('Wrong image format'), false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5
-  },
-  fileFilter: fileFilter
-});
 
 // Handle GET request to "/meals"
 router.get('/', (req, res, next) => {
@@ -52,18 +23,17 @@ router.get('/', (req, res, next) => {
 });
 
 // Handle POST request to "/meals"
-router.post('/', checkAuth, upload.single('image'), (req, res, next) => {
-  // console.log(req.body.authorId);
+router.post('/', (req, res, next) => {
   const meal = new Meal({
     _id: new mongoose.Types.ObjectId(),
-    image: req.file.path,
+    image: req.body.image,
     name: req.body.name,
     desc: req.body.desc,
     timeOfPreparation: req.body.timeOfPreparation,
     author: {
-      _id: req.body.authorId,
-      name: req.body.authorName,
-      surname: req.body.authorSurname
+      _id: req.body.author._id,
+      name: req.body.author.name,
+      surname: req.body.author.surname
     }
   });
 
