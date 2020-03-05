@@ -2,6 +2,9 @@
 
 RESTful API created in Node.js
 
+This API is used in recipes book:
+https://github.com/KamilWasilonek/Recipes-book
+
 ## Meals:
 
 List of all meals:
